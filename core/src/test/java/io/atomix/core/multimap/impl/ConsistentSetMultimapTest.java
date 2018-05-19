@@ -20,10 +20,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultiset;
-
 import io.atomix.core.AbstractPrimitiveTest;
 import io.atomix.core.multimap.AsyncConsistentMultimap;
-
 import org.junit.Test;
 
 import java.util.Collection;
@@ -277,6 +275,14 @@ public abstract class ConsistentSetMultimapTest extends AbstractPrimitiveTest {
     });
 
     map.delete().join();
+  }
+
+  @Test
+  public void testBlocking() throws Exception {
+    AsyncConsistentMultimap<String, String> map = createMultimap("testMultimapBlocking");
+    map.put("foo", "Hello world!").thenRun(() -> {
+      assertEquals(1, map.get("foo").join().value().size());
+    }).join();
   }
 
   /**
